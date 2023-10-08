@@ -1,0 +1,31 @@
+     1                                  extern printf
+     2                                  extern gettimeofday
+     3                                  
+     4                                  section .data
+     5 00000000 5365636F6E64732073-         fmt db "Seconds since Jan 1, 1970: %ld", 10, 0h
+     5 00000009 696E6365204A616E20-
+     5 00000012 312C20313937303A20-
+     5 0000001B 256C640A00         
+     6                                  section .bss
+     7 00000000 <res 10h>                   timeval resq 2
+     8                                  
+     9                                  section .text
+    10                                      global main
+    11                                  
+    12                                  main:
+    13 00000000 55                          push rbp
+    14 00000001 4889E5                      mov rbp, rsp
+    15                                  
+    16 00000004 48BF-                       mov rdi, timeval
+    16 00000006 [0000000000000000] 
+    17 0000000E BE00000000                  mov rsi, 0
+    18 00000013 E8(00000000)                call gettimeofday
+    19 00000018 488B0425[00000000]          mov rax, [timeval]
+    20 00000020 48BF-                       mov rdi, fmt
+    20 00000022 [0000000000000000] 
+    21 0000002A 4889C6                      mov rsi, rax
+    22 0000002D E8(00000000)                call printf
+    23                                  
+    24 00000032 C9                          leave
+    25 00000033 C3                          ret
+    26                                  

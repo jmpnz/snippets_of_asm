@@ -1,0 +1,36 @@
+     1                                  extern printf
+     2                                  
+     3                                  section .bss
+     4                                  section .text
+     5                                      global main
+     6                                  
+     7                                  main:
+     8 00000000 53                          push rbx
+     9 00000001 B964000000                  mov rcx, 100
+    10 00000006 4809C0                      or rax, rax
+    11 00000009 4831DB                      xor rbx, rbx
+    12 0000000C 48FFC3                      inc rbx
+    13                                  print:
+    14 0000000F 50                          push rax
+    15 00000010 51                          push rcx
+    16 00000011 48BF-                       mov rdi, format
+    16 00000013 [3800000000000000] 
+    17 0000001B 4889C6                      mov rsi, rax
+    18 0000001E 4831C0                      xor rax, rax
+    19                                  
+    20 00000021 E8(00000000)                call printf
+    21                                  
+    22 00000026 59                          pop rcx
+    23 00000027 58                          pop rax
+    24                                  
+    25 00000028 4889C2                      mov rdx, rax
+    26 0000002B 4889D8                      mov rax, rbx
+    27 0000002E 4801D3                      add rbx, rdx
+    28 00000031 48FFC9                      dec rcx
+    29 00000034 75D9                        jnz print
+    30                                  
+    31 00000036 5B                          pop rbx
+    32 00000037 C3                          ret
+    33                                  
+    34                                  format:
+    35 00000038 2533306C640A00              db "%30ld", 10, 0
