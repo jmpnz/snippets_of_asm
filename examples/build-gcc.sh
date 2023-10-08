@@ -9,8 +9,8 @@ fi
 filename=$(basename -- "$1")
 filename="${filename%.*}"
 
-nasm -f elf64 "$1"
-ld -o "$filename" "$filename".o
+nasm -f elf64 "$1" -g -F dwarf -l "$filename".lst
+gcc -o "$filename" "$filename".o -no-pie
 
 echo "Done..."
 exit 0

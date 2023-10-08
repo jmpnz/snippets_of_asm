@@ -1,0 +1,56 @@
+     1                                  ; reverse string with stack
+     2                                  extern printf
+     3                                  section .data
+     4 00000000 5241444152453200            strng db "RADARE2", 0
+     5                                      strngLen equ $-strng-1 ; string length
+     6 00000008 546865206F72696769-         fmt1 db "The original string : %s", 10, 0
+     6 00000011 6E616C20737472696E-
+     6 0000001A 67203A2025730A00   
+     7 00000022 546865207265766572-         fmt2 db "The reversed string : %s", 10, 0
+     7 0000002B 73656420737472696E-
+     7 00000034 67203A2025730A00   
+     8                                  section .bss
+     9                                  section .text
+    10                                      global main
+    11                                  main:
+    12 00000000 55                          push rbp
+    13 00000001 4889E5                      mov rbp, rsp
+    14                                      ; print the original string
+    15 00000004 48BF-                       mov rdi, fmt1
+    15 00000006 [0800000000000000] 
+    16 0000000E 48BE-                       mov rsi, strng
+    16 00000010 [0000000000000000] 
+    17 00000018 B800000000                  mov rax, 0
+    18 0000001D E8(00000000)                call printf
+    19                                      ; push the string characters into the stack
+    20 00000022 4831C0                      xor rax, rax ; clear rax
+    21 00000025 48BB-                       mov rbx, strng ; address of strng in rbx
+    21 00000027 [0000000000000000] 
+    22 0000002F B907000000                  mov rcx, strngLen ; length in rcx counter
+    23 00000034 41BC00000000                mov r12, 0 ; use r12 as an index into the string
+    24                                  pushloop:
+    25 0000003A 428A0423                    mov al, byte [rbx + r12] ; mov strng[0] to al
+    26 0000003E 50                          push rax ; save rax on the stack
+    27 0000003F 49FFC4                      inc r12 ; increment index
+    28 00000042 E2F6                        loop pushloop ; continue loop until we reach end of the string
+    29                                      ; pop the string in reverse
+    30 00000044 48BB-                       mov rbx, strng
+    30 00000046 [0000000000000000] 
+    31 0000004E B907000000                  mov rcx, strngLen
+    32 00000053 41BC00000000                mov r12, 0
+    33                                  poploop:
+    34 00000059 58                          pop rax ; pop a char from the stack
+    35 0000005A 42880423                    mov byte [rbx + r12], al ; mov char at strng[0]
+    36 0000005E 49FFC4                      inc r12 ; increment index
+    37 00000061 E2F6                        loop poploop ; keep on keeping on
+    38                                      ; print the reversed string
+    39 00000063 48BF-                       mov rdi, fmt2
+    39 00000065 [2200000000000000] 
+    40 0000006D 48BE-                       mov rsi, strng
+    40 0000006F [0000000000000000] 
+    41 00000077 B800000000                  mov rax, 0
+    42 0000007C E8(00000000)                call printf
+    43 00000081 4889EC                      mov rsp, rbp
+    44 00000084 5D                          pop rbp
+    45 00000085 C3                          ret
+    46                                  

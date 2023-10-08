@@ -1,0 +1,30 @@
+     1                                  extern printf
+     2                                  section .data
+     3 00000000 00CA9A3B00000000            number dq 1000000000
+     4 00000008 5468652073756D2066-         fmt db "The sum from 0 to %ld is %ld", 10, 0 ; format specifier
+     4 00000011 726F6D203020746F20-
+     4 0000001A 256C6420697320256C-
+     4 00000023 640A00             
+     5                                  section .bss
+     6                                  section .text
+     7                                      global main
+     8                                  main:
+     9 00000000 55                          push rbp
+    10 00000001 4889E5                      mov rbp, rsp
+    11 00000004 BB01000000                  mov rbx, 1 ; loop counter start at 1
+    12 00000009 B800000000                  mov rax, 0 ; sum in rax
+    13                                  jloop:
+    14 0000000E 4801D8                      add rax, rbx ; increment rax by rbx content
+    15 00000011 48FFC3                      inc rbx ; increment loop counter
+    16 00000014 483B1C25[00000000]          cmp rbx, [number] ; test if we reached number
+    17 0000001C 7EF0                        jle jloop ; if not reached goback to jloop
+    18                                      ; if reached
+    19 0000001E 48BF-                       mov rdi, fmt ;setup printf args
+    19 00000020 [0800000000000000] 
+    20 00000028 488B3425[00000000]          mov rsi, [number];
+    21 00000030 4889C2                      mov rdx, rax;
+    22 00000033 B800000000                  mov rax, 0
+    23 00000038 E8(00000000)                call printf
+    24 0000003D 4889EC                      mov rsp, rbp
+    25 00000040 5D                          pop rbp
+    26 00000041 C3                          ret

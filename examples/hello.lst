@@ -1,0 +1,18 @@
+     1                                  ; hello world
+     2                                  section .data
+     3 00000000 48656C6C6F2C20576F-         msg db "Hello, World !", 0
+     3 00000009 726C64202100       
+     4                                  section .bss ; empty
+     5                                  section .text
+     6                                      global main
+     7                                  
+     8                                  main:
+     9 00000000 B801000000                  mov rax, 1 ; syscall number for write
+    10 00000005 BF01000000                  mov rdi, 1 ; file descriptor number for stdout
+    11 0000000A 48BE-                       mov rsi, msg ; string to display in this case static
+    11 0000000C [0000000000000000] 
+    12 00000014 BA0E000000                  mov rdx, 14; length of the string
+    13 00000019 0F05                        syscall ; trap to OS
+    14 0000001B B83C000000                  mov rax, 60 ; syscall number for exit
+    15 00000020 BF00000000                  mov rdi, 0 ; arg to exit (exit code)
+    16 00000025 0F05                        syscall ; trap to OS
