@@ -1,0 +1,189 @@
+     1                                  ; What is my CPU capable of ?
+     2                                  extern printf
+     3                                  section .data
+     4 00000000 546869732063707520-         fmt_no_sse db "This cpu doesn't supports SSE", 10, 0
+     4 00000009 646F65736E27742073-
+     4 00000012 7570706F7274732053-
+     4 0000001B 53450A00           
+     5 0000001F 546869732063707520-         fmt_sse42 db "This cpu supports SSE 4.2", 10, 0
+     5 00000028 737570706F72747320-
+     5 00000031 53534520342E320A00 
+     6 0000003A 546869732063707520-         fmt_sse41 db "This cpu supports SSE 4.1", 10, 0
+     6 00000043 737570706F72747320-
+     6 0000004C 53534520342E310A00 
+     7 00000055 546869732063707520-         fmt_sse3 db "This cpu supports SSE 3.0", 10, 0
+     7 0000005E 737570706F72747320-
+     7 00000067 53534520332E300A00 
+     8 00000070 546869732063707520-         fmt_sse2 db "This cpu supports SSE 2.0", 10, 0
+     8 00000079 737570706F72747320-
+     8 00000082 53534520322E300A00 
+     9 0000008B 546869732063707520-         fmt_sse db "This cpu supports SSE", 10, 0
+     9 00000094 737570706F72747320-
+     9 0000009D 5353450A00         
+    10 000000A2 546869732063707520-         fmt_avx db "This cpu supports AVX", 10, 0
+    10 000000AB 737570706F72747320-
+    10 000000B4 4156580A00         
+    11 000000B9 546869732063707520-         fmt_avx2 db "This cpu supports AVX2", 10, 0
+    11 000000C2 737570706F72747320-
+    11 000000CB 415658320A00       
+    12 000000D1 546869732063707520-         fmt_avx512 db "This cpu supports AVX512", 10, 0
+    12 000000DA 737570706F72747320-
+    12 000000E3 4156583531320A00   
+    13 000000EB 546869732063707520-         fmt_no_avx512 db "This cpu doesn't support AVX512", 10, 0
+    13 000000F4 646F65736E27742073-
+    13 000000FD 7570706F7274204156-
+    13 00000106 583531320A00       
+    14                                  
+    15                                  section .bss
+    16                                  section .text
+    17                                      global main
+    18                                  main:
+    19 00000000 55                          push rbp
+    20 00000001 4889E5                      mov rbp, rsp
+    21 00000004 E802000000                  call cpu_sse
+    22 00000009 C9                          leave
+    23 0000000A C3                          ret
+    24                                  ; check for sse support
+    25                                  cpu_sse:
+    26 0000000B 55                          push rbp
+    27 0000000C 4889E5                      mov rbp, rsp
+    28 0000000F 4883EC08                    sub rsp, 8
+    29 00000013 4D31E4                      xor r12, r12
+    30 00000016 B801000000                  mov eax, 1 ; request CPU features
+    31 0000001B 0FA2                        cpuid ; cpu returns the feature information in rax, rbx, rcx and rdx
+    32                                      ; test for SSE
+    33 0000001D F7C200002000                test edx, 200000h ; test bit 25
+    34 00000023 7420                        jz sse2 ; sse available check for sse2
+    35 00000025 41BC01000000                mov r12, 1
+    36 0000002B 48BF-                       mov rdi, fmt_sse
+    36 0000002D [8B00000000000000] 
+    37 00000035 50                          push rax
+    38 00000036 51                          push rcx
+    39 00000037 52                          push rdx
+    40 00000038 B800000000                  mov rax, 0
+    41 0000003D E8(00000000)                call printf
+    42 00000042 5A                          pop rdx
+    43 00000043 59                          pop rcx
+    44 00000044 58                          pop rax
+    45                                  sse2:
+    46 00000045 F7C200004000                test edx, 400000h ; test bit 26 for sse2
+    47 0000004B 7420                        jz sse3 ; sse 2 available check for sse3
+    48 0000004D 41BC01000000                mov r12, 1
+    49 00000053 48BF-                       mov rdi, fmt_sse2
+    49 00000055 [7000000000000000] 
+    50 0000005D 50                          push rax
+    51 0000005E 51                          push rcx ; modified by printf
+    52 0000005F 52                          push rdx
+    53 00000060 B800000000                  mov rax, 0
+    54 00000065 E8(00000000)                call printf
+    55 0000006A 5A                          pop rdx
+    56 0000006B 59                          pop rcx
+    57 0000006C 58                          pop rax
+    58                                  sse3:
+    59 0000006D F7C109000000                test ecx, 9h ; test bit 0 (SSE 3)
+    60 00000073 7420                        jz sse41 ; sse3 available check for sse4
+    61 00000075 41BC01000000                mov r12, 1
+    62 0000007B 48BF-                       mov rdi, fmt_sse3
+    62 0000007D [5500000000000000] 
+    63 00000085 50                          push rax
+    64 00000086 51                          push rcx
+    65 00000087 52                          push rdx
+    66 00000088 B800000000                  mov rax, 0
+    67 0000008D E8(00000000)                call printf
+    68 00000092 5A                          pop rdx
+    69 00000093 59                          pop rcx
+    70 00000094 58                          pop rax
+    71                                  sse41:
+    72 00000095 F7C100000800                test ecx, 80000h ; test bit 19 sse 4.1
+    73 0000009B 7420                        jz sse42 ; sse 4.1 available check for sse 4.2
+    74 0000009D 41BC01000000                mov r12, 1
+    75 000000A3 48BF-                       mov rdi, fmt_sse41
+    75 000000A5 [3A00000000000000] 
+    76 000000AD 50                          push rax
+    77 000000AE 51                          push rcx
+    78 000000AF 52                          push rdx
+    79 000000B0 B800000000                  mov rax, 0
+    80 000000B5 E8(00000000)                call printf
+    81 000000BA 5A                          pop rdx
+    82 000000BB 59                          pop rcx
+    83 000000BC 58                          pop rax
+    84                                  sse42:
+    85 000000BD F7C100000100                test ecx, 10000h ; test bit 20 sse 4.2
+    86 000000C3 7420                        jz avx
+    87 000000C5 41BC01000000                mov r12, 1
+    88 000000CB 48BF-                       mov rdi, fmt_sse42
+    88 000000CD [1F00000000000000] 
+    89 000000D5 50                          push rax
+    90 000000D6 51                          push rcx
+    91 000000D7 52                          push rdx
+    92 000000D8 B800000000                  mov rax, 0
+    93 000000DD E8(00000000)                call printf
+    94 000000E2 5A                          pop rdx
+    95 000000E3 59                          pop rcx
+    96 000000E4 58                          pop rax
+    97                                  avx:
+    98 000000E5 F7C100000001                test ecx, 1000000h ; test bit 28 for avx
+    99 000000EB 7420                        jz avx2
+   100 000000ED 41BC01000000                mov r12, 1
+   101 000000F3 48BF-                       mov rdi, fmt_avx
+   101 000000F5 [A200000000000000] 
+   102 000000FD 50                          push rax
+   103 000000FE 51                          push rcx
+   104 000000FF 52                          push rdx
+   105 00000100 B800000000                  mov rax, 0
+   106 00000105 E8(00000000)                call printf
+   107 0000010A 5A                          pop rdx
+   108 0000010B 59                          pop rcx
+   109 0000010C 58                          pop rax
+   110                                  avx2:
+   111 0000010D F7C120000000                test ecx, 1 << 5 ; test bit 5 of eax for avx2
+   112 00000113 7420                        jz avx512
+   113 00000115 41BC01000000                mov r12, 1
+   114 0000011B 48BF-                       mov rdi, fmt_avx2
+   114 0000011D [B900000000000000] 
+   115 00000125 50                          push rax
+   116 00000126 51                          push rcx
+   117 00000127 52                          push rdx
+   118 00000128 B800000000                  mov rax, 0
+   119 0000012D E8(00000000)                call printf
+   120 00000132 5A                          pop rdx
+   121 00000133 59                          pop rcx
+   122 00000134 58                          pop rax
+   123                                  avx512:
+   124 00000135 F7C300000100                test ebx, 1 << 16
+   125 0000013B 743A                        jz no_avx
+   126 0000013D 41BC01000000                mov r12, 1
+   127 00000143 48BF-                       mov rdi, fmt_avx512
+   127 00000145 [D100000000000000] 
+   128 0000014D 50                          push rax
+   129 0000014E 51                          push rcx
+   130 0000014F 52                          push rdx
+   131 00000150 B800000000                  mov rax, 0
+   132 00000155 E8(00000000)                call printf
+   133 0000015A 5A                          pop rdx
+   134 0000015B 59                          pop rcx
+   135 0000015C 58                          pop rax
+   136                                  cleanup:
+   137 0000015D 4983FC01                    cmp r12, 1
+   138 00000161 742E                        je sse_ok
+   139 00000163 48BF-                       mov rdi, fmt_no_sse
+   139 00000165 [0000000000000000] 
+   140 0000016D 4831C0                      xor rax, rax
+   141 00000170 E8(00000000)                call printf
+   142 00000175 EB1D                        jmp exit
+   143                                  no_avx:
+   144 00000177 48BF-                       mov rdi, fmt_no_avx512
+   144 00000179 [EB00000000000000] 
+   145 00000181 50                          push rax
+   146 00000182 51                          push rcx
+   147 00000183 52                          push rdx
+   148 00000184 B800000000                  mov rax, 0
+   149 00000189 E8(00000000)                call printf
+   150 0000018E 5A                          pop rdx
+   151 0000018F 59                          pop rcx
+   152 00000190 58                          pop rax
+   153                                  sse_ok:
+   154 00000191 4C89E0                      mov rax, r12
+   155                                  exit:
+   156 00000194 C9                          leave
+   157 00000195 C3                          ret
