@@ -1,0 +1,49 @@
+     1                                  extern printf
+     2                                  section .data
+     3 00000000 54686520717569636B-         str1 db "The quick brown fox jumps over the lazy dog", 10, 0
+     3 00000009 2062726F776E20666F-
+     3 00000012 78206A756D7073206F-
+     3 0000001B 76657220746865206C-
+     3 00000024 617A7920646F670A00 
+     4 0000002D 537472696E673A2025-         fmt1 db "String: %s", 10, 0
+     4 00000036 730A00             
+     5 00000039 537472696E67206C65-         fmt2 db "String length: %d", 10,0
+     5 00000042 6E6774683A2025640A-
+     5 0000004B 00                 
+     6                                  section .bss
+     7                                  section .text
+     8                                      global main
+     9                                  main:
+    10 00000000 55                          push rbp
+    11 00000001 4889E5                      mov rbp, rsp
+    12 00000004 48BF-                       mov rdi, fmt1
+    12 00000006 [2D00000000000000] 
+    13 0000000E 48BE-                       mov rsi, str1
+    13 00000010 [0000000000000000] 
+    14 00000018 4831C0                      xor rax, rax
+    15                                      ; print the initial string.
+    16 0000001B E8(00000000)                call printf
+    17                                      ; prepare call to pstrlen function
+    18 00000020 48BF-                       mov rdi, str1
+    18 00000022 [0000000000000000] 
+    19 0000002A E817000000                  call pstrlen
+    20 0000002F 48BF-                       mov rdi, fmt2
+    20 00000031 [3900000000000000] 
+    21 00000039 4889C6                      mov rsi, rax ; return value of `call pstrlen`
+    22 0000003C 4831C0                      xor rax, rax
+    23 0000003F E8(00000000)                call printf
+    24 00000044 C9                          leave
+    25 00000045 C3                          ret
+    26                                  pstrlen:
+    27 00000046 55                          push rbp
+    28 00000047 4889E5                      mov rbp, rsp
+    29 0000004A 48C7C0F0FFFFFF              mov rax, -16
+    30 00000051 660FEFC0                    pxor xmm0, xmm0
+    31                                  .not_found:
+    32 00000055 4883C010                    add rax, 16
+    33 00000059 660F3A63040708              pcmpistri xmm0, [rdi + rax], 00001000b
+    34 00000060 75F3                        jnz .not_found
+    35 00000062 4801C8                      add rax, rcx
+    36 00000065 48FFC0                      inc rax
+    37 00000068 C9                          leave
+    38 00000069 C3                          ret
